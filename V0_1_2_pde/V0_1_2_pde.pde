@@ -3,6 +3,11 @@ import ddf.minim.*;
 
 Minim minim;
 AudioPlayer file;
+AudioPlayer file1;
+
+boolean startScreen = true;
+
+PImage startBackground;
 
 int pixelsize = 6;
 int gridsize  = pixelsize * 7 + 5;
@@ -20,7 +25,7 @@ PImage ballImage;
 boolean win = false;
 int level = 0;
 PImage image;
-
+float brightnessValue = 0.1; 
 void setup() {
     background(0);
     noStroke();
@@ -35,9 +40,38 @@ void setup() {
     String portName = Serial.list()[4];
     myPort = new Serial(this, portName, 115200);
     f = createFont("Arial", 36, true);
+    startBackground = loadImage("intro.jpg");
+    startBackground.resize(width, height);
 }
 
 void draw() {
+  file1 = minim.loadFile("camp.mp3");
+  file1.play();
+  if (startScreen) {
+    drawStartScreen();
+  } else {
+    file1.pause();
+    gameLoop();
+  }
+}
+void drawStartScreen() {
+  PImage adjustedBackground = startBackground.copy();
+  adjustedBackground.filter(0, brightnessValue);
+  background(adjustedBackground);
+  textSize(60);
+  fill(255);
+  textAlign(CENTER, CENTER);
+  text("Field Invaders", width/2, height/2 - 50);
+  textSize(40);
+  text("Press Enter to Start", width/2, height/2 + 50);
+}
+void keyPressed() {
+  if (keyCode == ENTER && startScreen) {
+    startScreen = false;
+  }
+}
+
+void gameLoop() {
     background(0);
     drawScore();
     player.draw();
